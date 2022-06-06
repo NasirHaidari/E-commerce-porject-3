@@ -1,4 +1,6 @@
 const mongoose = require('mongoose')
+const slugify = require('slugify')
+const geocoder = require('../utils/geocoder')
 
 const StoreSchema = new mongoose.Schema({
   name: {
@@ -35,26 +37,48 @@ const StoreSchema = new mongoose.Schema({
     required: [true, 'Please add a address'],
     maxlength: [500, 'Address can not be more than 500 characters'],
   },
-  Geolocation: {
+  location: {
     type: String,
-    location: {
-      type: {
-        type: String,
-        enum: ['Point'],
-        required: true,
-      },
-      coordinates: {
-        type: [Number],
-        required: true,
-      },
-      formattedAddress: String,
-      Street: String,
-      City: String,
-      State: String,
-      ZipCode: String,
-      country: String,
+
+    type: {
+      type: String,
+      enum: ['Point'],
     },
+    coordinates: {
+      type: [Number],
+      index: '2dsphere',
+    },
+    formattedAddress: String,
+    Street: String,
+    City: String,
+    State: String,
+    ZipCode: String,
+    country: String,
   },
 })
+
+//creating product slug from the name
+
+StoreSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true })
+  next()
+})
+
+//Geocode & create location field
+StoreSchema.pre('save', async function (next) {
+  const loc = await geocoder.geocode(this.address)
+  this.location = {
+    type: 'Point',
+    coordinates: [loc[0].longitude, loc[0].latitude],
+    formattedAddress: loc[0].formattedAddress,
+    Street: loc[0].streetName,
+    City: loc[0].city,
+    State: loc[0].state,
+    ZipCode: loc[0].zipcode,
+    country: loc[0].country,
+  }
+  // Do not save address in DB
+  next()
+}) //end of pre save
 
 module.exports = mongoose.model('Store', StoreSchema)

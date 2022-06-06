@@ -1,0 +1,16 @@
+[
+  {
+    "name": "test-store",
+    "description": "dummy description",
+    "phone": "222323232",
+    "email": "sldkfsdlfkj@sdfsd.se",
+    "address": "Byggmästaregatan 66 Svedala"
+  },
+  {
+    "name": "test-store2",
+    "description": "dummy description2",
+    "phone": "004466666",
+    "email": "sldkfsdlfkj@sdfsd.se",
+    "address": "Byggmästaregatan 2 Svedala "
+  }
+]

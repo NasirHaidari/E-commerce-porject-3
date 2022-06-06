@@ -5,10 +5,36 @@ const asyncHandler = require('../middleware/async')
 //GET all products
 //route : /api/v1/products
 exports.getProducts = asyncHandler(async (req, res, next) => {
-  const products = await Product.find()
+  console.log('req.query', req.query)
+  let query
+
+  // Copy req.query
+  const reqQuery = { ...req.query }
+
+  // Fields to exclude
+  const removeFields = ['select']
+
+  // Loop over removeFields and delete them from reqQuery
+  removeFields.forEach((param) => delete reqQuery[param])
+
+  console.log(req.query)
+
+  // Create query string
+  let queryStr = JSON.stringify(reqQuery)
+
+  // Create operators ($gt, $gte, $lt, $lte)
+  queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`)
+
+  // Finding resources
+  query = Product.find(JSON.parse(queryStr))
+  //const products = await Product.find(queryStr)
+
+  // Exclude query
+  const products = await query
+
   res
     .status(200)
-    .json({ success: true, lenght: products.length, data: products })
+    .json({ success: true, length: products.length, data: products })
 })
 
 //GET a product

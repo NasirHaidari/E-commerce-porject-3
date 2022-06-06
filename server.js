@@ -10,6 +10,7 @@ dotenv.config({ path: './config/config.env' })
 
 //Route files
 const products = require('./routes/products')
+const stores = require('./routes/stores')
 
 const app = express()
 
@@ -27,8 +28,12 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/api/v1/products', products)
 app.use(errorHandler)
 
+//Mount Stores
+app.use('/api/v1/stores', stores)
+
 const PORT = process.env.PORT || 5000
 
+// Start server
 const server = app.listen(PORT, () => {
   console.log(
     `Server running on port  ${PORT} , running on ${process.env.NODE_ENV} mode`
